@@ -1,6 +1,6 @@
 {
   "author": "mklabs",
-  "name": "mockup",
+  "name": "mockerie",
   "description": "Static site generator - mix, watch and reload plates/mustaches with static assets",
   "version": "0.0.1",
   "engines": {
@@ -13,6 +13,7 @@
     "github-flavored-markdown": "~1.0.0",
     "mustache": "~0.4.0",
     "connect": "~1.8.5",
-    "socket.io": "~0.8.7"
+    "socket.io": "~0.8.7",
+    "grunt": "~0.2.4"
   }
 }
