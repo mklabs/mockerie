@@ -2,8 +2,9 @@
 var fs = require('fs');
   path = require('path'),
   mkdirp = require('mkdirp'),
-  plates = require('plates'),
   rimraf = require('rimraf'),
+  plates = require('plates'),
+  mustache = require('mustache'),
   ghm = require('github-flavored-markdown');
 
 // very much inspired by stenson/inca
@@ -37,25 +38,44 @@ task.registerBasicTask('mockup', 'Generates the sites mockup', function(data, na
 task.registerHelper('mockup-templates', function(name, data) {
   var files = file.expand(data.pages.map(function(f) { return path.resolve(name, f); }))
     layout = files.filter(function(f) { return path.basename(f) === 'layout.html'; })[0],
+    layoutMarkdown = files.filter(function(f) { return path.basename(f) === 'layout.md.html'; })[0],
     templates = {};
 
   // Deal with the special layout.html file, nested each other
   // template `body` into the `{{{ body }}}` placeholder of our layout
   if(!layout) return fail.warn('Missing layout.html file', 3);
-
   layout = fs.readFileSync(layout, 'utf8');
+
+  // optionnal specific to markdown files layout, fallback to basically
+  // nothing if nothing found
+  layoutMarkdown = layoutMarkdown ? fs.readFileSync(layoutMarkdown, 'utf8') : '{{{ body }}}';
 
   // filter out the layout template from files to generate
   files = files.filter(function(f) { return path.basename(f) !== 'layout.html'; });
 
   files.forEach(function(file) {
+
+    // precompile each files template.
+    //
+    // There are two main page types: html and markdown. Templates are
+    // "decorated" by a layout template. The main one `layout.html` is
+    // mandatory and is used for any html template, an optionnal
+    // `layout.md.html` if there is then used on top of markdown pages.
+    //
+    // In the case of html templates, the default plates template engine
+    // is used. If you need a little more flexibility, you may use the
+    // mustache syntax in your templates ( `{{ something }}`). If some
+    // mustache are detected, the rendering engine switch to mustache.
     templates[path.basename(file).replace(path.extname(file), '')] = (function() {
       var html = fs.readFileSync(file, 'utf8');
       return function() {
-        var body = !!~['.md', '.markdown', '.mkd'].indexOf(path.extname(file)) ?
-          ghm.parse(html).replace(/<br\s?\/>/g, ' ') : plates.bind(html, arguments[0], arguments[1]);
+        var md = !!~['.md', '.markdown', '.mkd'].indexOf(path.extname(file)),
+          stache = /{{{?[^}]+}}}?/.test(html),
+          body = md ? ghm.parse(html).replace(/<br\s?\/>/g, ' ') :
+            stache ? mustache.to_html(html, arguments[0]):
+            plates.bind(html, arguments[0], arguments[1]);
 
-        return layout.replace(/{{{ body }}}/g, body);
+        return (md ? layoutMarkdown : layout).replace(/{{{ body }}}/g, body);
       };
     })();
   });
