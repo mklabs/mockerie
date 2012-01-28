@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+
+var grunt = require('grunt'),
+  fs = require('fs'),
+  path = require('path');
+
+var cli = require('grunt/lib/grunt/cli');
+
+var optlist = cli.optlist;
+
+if(cli.options.help) return help();
+
+grunt.cli({
+  tasks: [path.join(__dirname, '../lib/tasks')],
+  config: path.join(__dirname, '../grunt.js'),
+  base: process.cwd()
+});
+
+
+function help() {
+
+  // Print grunt version.. Also initing colors for later use
+  task.init([]);
+
+  // the list of tasks we'd like to output
+  var knowns = {
+    init: {info: 'Initialize a new mockup with grunt.js and the dirs for pages, assets and json files'},
+    mockup: {info: 'Generate the site content'},
+    'mockup:reload': { info: 'Watch files to retrigger a new build and a page reload'},
+    'mockup:serve': {info: 'Spawn a local http server on top of mockup output'},
+
+  };
+
+  var col1len = 0;
+
+  var opts = Object.keys(optlist).map(function(long) {
+    var o = optlist[long];
+    var col1 = '--' + long + (o.short ? ', -' + o.short : '');
+    col1len = Math.max(col1len, col1.length);
+    return [col1, o.info];
+  });
+
+  var tasks = Object.keys(knowns)
+    .filter(function(s) { return true; })
+    .map(function(name) {
+      col1len = Math.max(col1len, name.length);
+      var info = knowns[name].info;
+      if (knowns[name].basic) {
+        info += ' *';
+      }
+      return [name, info];
+    });
+
+  // Adjust to allow for spacing.
+  col1len += 2;
+
+  // Match as many characters as possible until a set numeric limit has been
+  // reached, avoiding splitting words whenever possible.
+  var re = new RegExp('.{1,' + (80 - col1len - 1) + '}(?=\\s|$)', 'g');
+
+  // Actually write output, padding and wrapping as necessary..
+  function writeln(arr) {
+    var col1 = arr[0];
+    var col2 = arr[1].replace(re, function(s) {
+      return '\n' + log.pad(col1len + 1) + s.replace(/^\s+/, '');
+    }).replace(/^\s+/, '');
+    log.writeln(' ' + col1 + log.pad(col1len - col1.length) + col2);
+  }
+
+  log.writeln('Using grunt: a command line build tool for JavaScript projects. (v' + grunt.version + ')');
+
+  // Actually write out help screen.
+  log.subhead('Usage');
+  log.writeln(' ' + path.basename(process.argv[1]) + ' [options] [task [task ...]]');
+
+  log.subhead('Tasks');
+  tasks.forEach(writeln);
+
+  log.subhead('Options');
+  opts.forEach(writeln);
+
+
+
+}

@@ -40,15 +40,6 @@ config.init({
       config: 'socket',
       event: 'changed'
     }
-  },
-
-  // shameless slight setTimeout, ensure the file is there
-  // when the page refreshs. Suspecting my vim to mess around here,
-  // this should not be required but seems like the mockup task
-  // is run at the moment when the changed file may not be present in the
-  // file system (and readded right away)
-  waitalittle: {
-    dummy: 'race condition workaround'
   }
 });
 
