@@ -1,0 +1,8 @@
+{
+  "description": "You may use pure html markup, and it'll be passed through plates.",
+  "name": "How",
+  "cool": "Cool",
+  "is": "Is",
+  "that": "Thattttttttt",
+  "engine": "flatiron/plates"
+}
