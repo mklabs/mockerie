@@ -12,11 +12,14 @@ if(cli.options.help) return help();
 
 grunt.cli({
   tasks: [path.join(__dirname, '../lib/tasks')],
-  config: path.join(__dirname, '../grunt.js'),
+  config: path.existsSync('./grunt.js') ? './grunt.js' : path.join(__dirname, '../grunt.js'),
   base: process.cwd()
 });
 
 
+// help output, borrowed to grunt.
+// Done here to alter the help output, we want to expose only the
+// mockup related tasks / config.
 function help() {
 
   // Print grunt version.. Also initing colors for later use
