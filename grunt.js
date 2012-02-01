@@ -29,16 +29,10 @@ config.init({
 
   serve: {
     'mockup/output': {
+      hostname: 'localhost',
       port: 3001,
       logs: 'default',
       dirs: true
-    }
-  },
-
-  emit: {
-    reload: {
-      config: 'socket',
-      event: 'changed'
     }
   }
 });
