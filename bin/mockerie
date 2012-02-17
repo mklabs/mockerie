@@ -10,8 +10,10 @@ var optlist = cli.optlist;
 
 if(cli.options.help) return help();
 
+var userpaths = path.existsSync('./tasks') ? ['./tasks'] : [];
+
 grunt.cli({
-  tasks: [path.join(__dirname, '../lib/tasks')],
+  tasks: [path.join(__dirname, '../lib/tasks')].concat(userpaths),
   config: path.existsSync('./grunt.js') ? './grunt.js' : path.join(__dirname, '../grunt.js'),
   base: process.cwd()
 });
