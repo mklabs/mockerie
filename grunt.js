@@ -24,7 +24,7 @@ config.init({
 
   watch: {
     files: ['mockup/pages/*', 'mockup/data/*.json', 'mockup/assets/**'],
-    tasks: 'waitalittle mockup emit:reload'
+    tasks: 'notify waitalittle mockup emit:reload'
   },
 
   serve: {
